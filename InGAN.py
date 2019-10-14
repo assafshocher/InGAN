@@ -99,9 +99,8 @@ class InGAN:
                     'iter': citer if citer else self.cur_iter},
                    os.path.join(self.conf.output_dir_path, filename))
 
-    def resume(self, resume_path):
+    def resume(self, resume_path, test_flag=False):
         resume = torch.load(resume_path, map_location={'cuda:5': 'cuda:0'})
-
         missing = []
         if 'G' in resume:
             self.G.load_state_dict(resume['G'])
@@ -111,26 +110,27 @@ class InGAN:
             self.D.load_state_dict(resume['D'])
         else:
             missing.append('D')
-        if 'optim_G' in resume:
-            self.optimizer_G.load_state_dict(resume['optim_G'])
-        else:
-            missing.append('optimizer G')
-        if 'optim_D' in resume:
-            self.optimizer_D.load_state_dict(resume['optim_D'])
-        else:
-            missing.append('optimizer D')
-        if 'sched_G' in resume:
-            self.lr_scheduler_G.load_state_dict(resume['sched_G'])
-        else:
-            missing.append('lr scheduler G')
-        if 'sched_D' in resume:
-            self.lr_scheduler_D.load_state_dict(resume['sched_D'])
-        else:
-            missing.append('lr scheduler G')
-        if 'loss' in resume:
-            self.GAN_loss_layer.load_state_dict(resume['loss'])
-        else:
-            missing.append('GAN loss')
+        if not test_flag:
+            if 'optim_G' in resume:
+                self.optimizer_G.load_state_dict(resume['optim_G'])
+            else:
+                missing.append('optimizer G')
+            if 'optim_D' in resume:
+                self.optimizer_D.load_state_dict(resume['optim_D'])
+            else:
+                missing.append('optimizer D')
+            if 'sched_G' in resume:
+                self.lr_scheduler_G.load_state_dict(resume['sched_G'])
+            else:
+                missing.append('lr scheduler G')
+            if 'sched_D' in resume:
+                self.lr_scheduler_D.load_state_dict(resume['sched_D'])
+            else:
+                missing.append('lr scheduler G')
+            if 'loss' in resume:
+                self.GAN_loss_layer.load_state_dict(resume['loss'])
+            else:
+                missing.append('GAN loss')
         if len(missing):
             warnings.warn('Missing the following state dicts from checkpoint: {}'.format(', '.join(missing)))
 

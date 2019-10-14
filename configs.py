@@ -11,11 +11,21 @@ class Config:
         self.conf = None
 
         # Paths
-        self.parser.add_argument('--input_image_path', default=[os.path.dirname(os.path.abspath(__file__)) + '/metal_circles.jpg'], nargs='+', help='path to one specific image file')
+        self.parser.add_argument('--input_image_path', default=[os.path.dirname(os.path.abspath(__file__)) + '/examples/fruit/fruit.png'], nargs='+', help='path to one specific image file')
         self.parser.add_argument('--output_dir_path', default=os.path.dirname(os.path.abspath(__file__)) + '/results', help='path to a directory to save results to')
-        self.parser.add_argument('--name', default='metal_circles', help='name of current experiment, to be used for saving the results')
+        self.parser.add_argument('--name', default='fruit', help='name of current experiment, to be used for saving the results')
         self.parser.add_argument('--resume', type=str, default=None, help='checkpoint to resume from')
-        self.parser.add_argument('--test_params_path', type=str, default=None, help='checkpoint for testing')
+        self.parser.add_argument('--test_params_path', type=str, default=os.path.dirname(os.path.abspath(__file__)) + '/examples/fruit/checkpoint_0075000.pth.tar', help='checkpoint for testing')
+
+        # Test
+        self.parser.add_argument('--test_collage', default=True, action='store_true',  help='Create collage in test?')
+        self.parser.add_argument('--test_video', default=True, action='store_true', help='Create retarget-video in test?')
+        self.parser.add_argument('--test_non_rect', default=False, action='store_true',  help='Produce non-rectangular transformations in test?')
+        self.parser.add_argument('--test_vid_scales', type=float, default=[2.2, 0.1, 2.2, 0.1], nargs='+', help='boundary scales for output video: [max_v, min_v, max_h, min_h]')
+        self.parser.add_argument('--collage_scales', type=float, default=[2.0, 1.25, 1.0, 0.66, 0.33], nargs='+', help='scales for collage (h=w, only one number)')
+        self.parser.add_argument('--collage_input_spot', type=float, default=[2, 2], nargs='+', help='replaces one spot in the collage with original input. must match a spot with scale 1.0')
+        self.parser.add_argument('--non_rect_shift_range', type=float, default=[-0.8, 1.0, 0.2], nargs='+', help='range for homography shifts for non rect transforms [min, max, step]')
+        self.parser.add_argument('--non_rect_scales', type=float, default=[0.7, 1.0], nargs='+', help='list of scales for non_rect outputs')
 
         # Architecture (Generator)
         self.parser.add_argument('--G_base_channels', type=int, default=64, help='# of base channels in G')
