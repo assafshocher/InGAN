@@ -5,6 +5,8 @@ Project page: http://www.wisdom.weizmann.ac.il/~vision/ingan/ (See our results a
 
 **Accepted ICCV'19 (Oral)**
 ----------
+![](/figs/fruits.gif)
+----------
 If you find our work useful in your research or publication, please cite our work:
 
 ```
@@ -50,6 +52,9 @@ python train.py --input_image_path /path/to/some/image.png  # choose input image
 python train.py --G_num_resblocks 3  # change number of residual block in the generator
 ```
 Please see configs.py for many more options
+### monitoring
+In you results folder, monitor files will be periodically created, example:
+![](/figs/monitor_60000.png)
 
 ## Produce complex animations by scripts:  
 Please see the file supp_video.py
