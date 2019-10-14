@@ -1,6 +1,6 @@
 import os
 import threading
-import queue as Queue
+import Queue
 import subprocess
 
 base_dir = './side/'

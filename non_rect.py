@@ -87,29 +87,10 @@ def apply_resize_and_radial(x, target_size, rand_r):
     out = f.grid_sample(x, grid, mode='bilinear', padding_mode='border')
     return out
 
-
 def make_radial_scale_grid(rand_r, size4d):
     y, x = torch.meshgrid((torch.linspace(-1., 1., size4d[-2]), torch.linspace(-1., 1., size4d[-1])))
-    x = x.cuda().expand((size4d[0], *x.shape))[..., None]
-    y = y.cuda().expand((size4d[0], *y.shape))[..., None]
-    theta = torch.atan2(y, x)
-    r = torch.sqrt(x**2 + y**2)
-    nr = r * (1. + rand_r * torch.abs(torch.cos(theta * 2)))
-    return torch.cat((nr * torch.cos(theta), nr*torch.sin(theta)), dim=-1).detach().cuda()
-
-
-if __name__ == '__main__':
-    from PIL import Image
-    import util
-    from InGAN import InGAN
-    from configs import Config
-
-    conf = Config().parse()
-    gan = InGAN(conf)
-    sd = torch.load('results/multi_07_geo_new_pad_Mar_19_06_39_44/checkpoint_0075000.pth.tar')
-    gan.G.load_state_dict(sd['G'])
-    img = util.read_shave_tensorize('multi_07.png', 8)
-    Image.fromarray(util.tensor2im(gan.G(img, img.shape[2:], [.25]))).show()
+    theta = torch.atan2(x, y)
+    r = torch.sqrt()
 
 '''
 def test_time():

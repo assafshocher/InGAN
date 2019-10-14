@@ -34,13 +34,13 @@ class LocalNorm(nn.Module):
 
     def forward(self, input_tensor):
         local_mean = self.get_local_mean(input_tensor)
-        # print local_mean
+        print local_mean
         centered_input_tensor = input_tensor - local_mean
-        # print centered_input_tensor
+        print centered_input_tensor
         squared_diff = centered_input_tensor ** 2
-        # print squared_diff
+        print squared_diff
         local_std = self.get_var(squared_diff) ** 0.5
-        # print local_std
+        print local_std
         normalized_tensor = centered_input_tensor / (local_std + 1e-8)
 
         return normalized_tensor # * self.weight[None, :, None, None] + self.bias[None, :, None, None]
@@ -394,23 +394,12 @@ class GeoTransform(nn.Module):
         super(GeoTransform, self).__init__()
 
     def forward(self, input_tensor, target_size, shifts):
-        if len(shifts) == 1:
-            # radial
-            psf = 0.5  # max(0, shifts[0])
-            isz = input_tensor.shape
-            pad = f.pad(input_tensor, [int(isz[-1] * psf), int(isz[-1] * psf),
-                                       int(isz[-2] * psf), int(isz[-2] * psf)], 'reflect')
-            target_size4d = torch.Size([pad.shape[0], pad.shape[1], target_size[0], target_size[1]])
-            grid = non_rect.make_radial_scale_grid(shifts[0], target_size4d)
-        else:
-            # homographies
-            sz = input_tensor.shape
-            theta = homography_based_on_top_corners_x_shift(shifts)
+        sz = input_tensor.shape
+        theta = homography_based_on_top_corners_x_shift(shifts)
 
-            pad = f.pad(input_tensor,
-                        (np.abs(np.int(np.ceil(sz[3] * shifts[0]))), np.abs(np.int(np.ceil(-sz[3] * shifts[1]))), 0, 0),
-                        'reflect')
-            target_size4d = torch.Size([pad.shape[0], pad.shape[1], target_size[0], target_size[1]])
-            grid = homography_grid(theta.expand(pad.shape[0], -1, -1), target_size4d)
+        pad = f.pad(input_tensor, (np.abs(np.int(np.ceil(sz[3] * shifts[0]))), np.abs(np.int(np.ceil(-sz[3] * shifts[1]))), 0, 0), 'reflect')
+        target_size4d = torch.Size([pad.shape[0], pad.shape[1], target_size[0], target_size[1]])
+
+        grid = homography_grid(theta.expand(pad.shape[0], -1, -1), target_size4d)
 
         return f.grid_sample(pad, grid, mode='bilinear', padding_mode='border')

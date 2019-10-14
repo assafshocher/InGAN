@@ -247,6 +247,7 @@ def prepare_result_dir(conf):
     return conf.output_dir_path
 
 
+
 def homography_based_on_top_corners_x_shift(rand_h):
     p = np.array([[1., 1., -1, 0, 0, 0, -(-1. + rand_h[0]), -(-1. + rand_h[0]), -1. + rand_h[0]],
                   [0, 0, 0, 1., 1., -1., 1., 1., -1.],
@@ -287,3 +288,47 @@ def homography_grid(theta, size):
     # normalize
     out = out[:, :, :2] / out[:, :, 2:]
     return out.view(theta.shape[0], np.int(size[-2]*a), np.int(size[-1]*a), 2)
+
+
+def hist_match(source, template, mask_3ch):
+    """
+    Adjust the pixel values of a grayscale image such that its histogram
+    matches that of a target image
+
+    Arguments:
+    -----------
+        source: np.ndarray
+            Image to transform; the histogram is computed over the flattened
+            array
+        template: np.ndarray
+            Template image; can have different dimensions to source
+    Returns:
+    -----------
+        matched: np.ndarray
+            The transformed output image
+    """
+
+    oldshape = source.shape
+    source_masked = source.ravel()[mask_3ch.ravel() > 128]
+    template = template.ravel()
+    # get the set of unique pixel values and their corresponding indices and
+    # counts
+    s_values, bin_idx, s_counts = np.unique(source_masked, return_inverse=True,
+                                            return_counts=True)
+    t_values, t_counts = np.unique(template, return_counts=True)
+
+    # take the cumsum of the counts and normalize by the number of pixels to
+    # get the empirical cumulative distribution functions for the source and
+    # template images (maps pixel value --> quantile)
+    s_quantiles = np.cumsum(s_counts).astype(np.float64)
+    s_quantiles /= s_quantiles[-1]
+    t_quantiles = np.cumsum(t_counts).astype(np.float64)
+    t_quantiles /= t_quantiles[-1]
+
+    # interpolate linearly to find the pixel values in the template image
+    # that correspond most closely to the quantiles in the source image
+    interp_t_values = np.interp(s_quantiles, t_quantiles, t_values)
+
+    out = source.copy().ravel()
+    out[mask_3ch.ravel() > 128] = interp_t_values[bin_idx]
+    return out.reshape(oldshape)

@@ -11,9 +11,9 @@ class Config:
         self.conf = None
 
         # Paths
-        self.parser.add_argument('--input_image_path', default=[os.path.dirname(os.path.abspath(__file__)) + '/14_s.jpg'], nargs='+', help='path to one specific image file')
+        self.parser.add_argument('--input_image_path', default=[os.path.dirname(os.path.abspath(__file__)) + '/metal_circles.jpg'], nargs='+', help='path to one specific image file')
         self.parser.add_argument('--output_dir_path', default=os.path.dirname(os.path.abspath(__file__)) + '/results', help='path to a directory to save results to')
-        self.parser.add_argument('--name', default='dbg', help='name of current experiment, to be used for saving the results')
+        self.parser.add_argument('--name', default='metal_circles', help='name of current experiment, to be used for saving the results')
         self.parser.add_argument('--resume', type=str, default=None, help='checkpoint to resume from')
         self.parser.add_argument('--test_params_path', type=str, default=None, help='checkpoint for testing')
 
@@ -46,7 +46,7 @@ class Config:
         self.parser.add_argument('--max_scale', type=float, default=2.25, help='max retargeting scale')
         self.parser.add_argument('--min_scale', type=float, default=0.15, help='min retargeting scale')
         self.parser.add_argument('--must_divide', type=int, default=8, help='In curriculum learning, when getting to this iteration all range is covered')
-        self.parser.add_argument('--max_transform_magnitude', type=float, default=0.4, help='max manitude of geometric transformation')
+        self.parser.add_argument('--max_transform_magnitude', type=float, default=0.0, help='max manitude of geometric transformation')
 
         # Crop Swap
         self.parser.add_argument('--crop_swap_min_size', type=int, default=32, help='swapping crops augmnetation')

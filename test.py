@@ -284,12 +284,15 @@ def main():
                                  # ['emojis3', 'emojis3.png', '/emojis3_Nov_23_09_59_59']
                                  # ['farm_house_plethora', 'farm_house_s.png', '/farm_house_to_resume_Mar_18_20_41_37'],
                                  # ['building_plethora', 'building_s.png', '/building_s_plethora_75_Mar_18_04_15_25'],
-                                 ['fish_plethora', 'input/fish.png', '/fish_plethora_75_Mar_18_03_36_25'],
+                                 # ['fish_plethora', 'input/fish.png', '/fish_plethora_75_Mar_18_03_36_25'],
                                  # ['blueman_plethora', 'input/blueman.png', '/blueman_plethora_75_Mar_17_20_49_11'],
                                  # ['cab_building_plethora', 'cab_building_s.png', '/cab_building_s_plethora_75_Mar_18_14_11_41'],
                                  # ['ny_plethora', 'textures/ny.png', '/ny_texture_synth_Mar_19_04_51_14'],
                                  # ['ny_plethora_side', 'side/ny.png', '/ny_geo_side_Mar_20_13_25_40'],
                                  # ['fruits_plethora_side', 'side/fruits_ss.png', '/fruits_ss_geo_side_Mar_20_13_25_40'],
+                                 # ['umbrella', 'umbrella.png', '/umbrella'],
+                                 # ['quilt', 'quilt.png', '/quilt'],
+                                 ['elect', 'elect.png', '/metal_circles_Apr_09_20_38_53']
 
     ]
     # name_infile_ckptfile_list = [['nrid_%d_075' % i, 'scaled_nird/ours_%d_scaled.jpg' % i, 'ours_%d' % i]
@@ -314,11 +317,11 @@ def main():
                 gan.resume(conf.test_params_path)
                 [input_tensor] = util.read_data(conf)
 
-                # retarget_video(gan, input_tensor, define_video_scales(), 8, conf.output_dir_path, conf.name)
+                retarget_video(gan, input_tensor, define_video_scales(), 8, conf.output_dir_path, conf.name)
 
-                # generate_collage_and_outputs(conf, gan, input_tensor)
+                generate_collage_and_outputs(conf, gan, input_tensor)
 
-                test_homo(conf, gan, input_tensor, snapshot_iter / 1000)
+                # test_homo(conf, gan, input_tensor, snapshot_iter / 1000)
 
                 print 'Done with %s (%d/%d), iter %dk' % (input_image_path, i, n_files, snapshot_iter )
 
