@@ -1,9 +1,58 @@
 # InGAN
 ### Official code for the paper "InGAN: Capturing and Retargeting the DNA of a Natural Image"
+
+Project page: http://www.wisdom.weizmann.ac.il/~vision/ingan/ (See our results and visual comparison to other methods)
+
+**Accepted ICCV'19 (Oral)**
 ----------
-## Comments and examples will be added soon.
+If you find our work useful in your research or publication, please cite our work:
+
+```
+@InProceedings{InGAN,
+  author = {Assaf Shocher and Shai Bagon and Phillip Isola and Michal Irani},
+  title = {InGAN: Capturing and Retargeting the "DNA" of a Natural Image},
+  booktitle = {The IEEE International Conference on Computer Vision (ICCV)},
+  year = {2019}
+}
+```
 ----------
-- To train use the configs file to set options and input image path, then run train.py.
-- Once trained, testing and producing a video and a grid of various sizes can be done by test.py (use the saved checkpoint).
-- To train multiple files in parallel use train_supp_mat.py
-- Creating a video with various animations (like our supp-video) can be done using supp_video.py
+
+# Usage:
+## Test
+### Quick example
+First you have to download the example checkpoint file from the project web page. and put it in ``` InGAN/examples/fruit/ ```
+Will defaulty run on the fruits image, using an existing checkpoint.
+```
+python test.py
+```
+### General testing
+See configs.py, for all the options. You can either edit this file or modify configuration from command-line.
+Examples:
+```
+python test.py --input_image_path /path/to/some/image.png  # choose input image
+python test.py --test_non_rect  # also output non rectangular transformation results
+python test.py --test_vid_scale 2.0, 0.5, 2.5, 0.2  # boundary scales for output video: [max_v, min_v, max_h, min_h]
+```
+Please see configs.py for many more options
+
+
+## Train
+### Quick example
+Will defaulty run on the fruits image.
+```
+python train.py
+```
+### General training
+See configs.py for all the options. You can either edit this file or modify configuration from command-line.
+Examples:
+```
+python train.py --input_image_path /path/to/some/image.png  # choose input image
+python train.py --G_num_resblocks 3  # change number of residual block in the generator
+```
+Please see configs.py for many more options
+
+## Produce complex animations by scripts:  
+Please see the file supp_video.py
+
+## Parallel training for many images
+Please see the file train_supp_mat.py
