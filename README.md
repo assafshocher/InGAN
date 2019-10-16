@@ -22,8 +22,7 @@ If you find our work useful in your research or publication, please cite our wor
 # Usage:
 ## Test
 ### Quick example
-First you have to download the example checkpoint file: http://www.wisdom.weizmann.ac.il/~vision/ingan/resource/checkpoint_0075000.pth.tar 
-and put it in ``` InGAN/examples/fruit/ ```.
+First you have to [download the example checkpoint file](http://www.wisdom.weizmann.ac.il/~vision/ingan/resource/checkpoint_0075000.pth.tar), and put it in ``` InGAN/examples/fruit/ ```.
 Will defaulty run on the fruits image, using an existing checkpoint.
 ```
 python test.py
