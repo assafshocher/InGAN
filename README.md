@@ -27,7 +27,10 @@ Will defaulty run on the fruits image, using an existing checkpoint.
 ```
 python test.py
 ```
+
 ### General testing
+By default, when testing you get a collage of various sizes and a smooth video of the transforms. You can also choose to test specific sizes, non-rectangular transforms and more.
+
 See configs.py, for all the options. You can either edit this file or modify configuration from command-line.
 Examples:
 ```
