@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from networks import GeoTransform
 from PIL import Image
 import util
@@ -7,7 +9,6 @@ from traceback import print_exc
 from skvideo.io import FFmpegWriter
 import os
 from non_rect import *
-
 
 def test_one_scale(gan, input_tensor, scale, must_divide, affine=None, return_tensor=False, size_instead_scale=False):
     with torch.no_grad():
@@ -31,7 +32,7 @@ def test_one_scale(gan, input_tensor, scale, must_divide, affine=None, return_te
 
 
 def concat_images(images, margin, input_spot):
-    h_sizes = [im.shape[0] for im in zip(*images)[0]]
+    h_sizes = [im.shape[0] for im in [image[0] for image in images]]
     w_sizes = [im.shape[1] for im in images[0]]
     h_total_size = np.sum(h_sizes) + margin * (len(images) - 1)
     w_total_size = np.sum(w_sizes) + margin * (len(images) - 1)
@@ -45,8 +46,8 @@ def concat_images(images, margin, input_spot):
             bottom_right_corner_w = int(top_left_corner_w + w_sizes[i])
 
             if [i, j] == input_spot:
-                collage[top_left_corner_h - margin/2: bottom_right_corner_h + margin/2,
-                        top_left_corner_w - margin/2: bottom_right_corner_w + margin/2,
+                collage[top_left_corner_h - margin//2: bottom_right_corner_h + margin//2,
+                        top_left_corner_w - margin//2: bottom_right_corner_w + margin//2,
                         :] = [255, 0, 0]
             collage[top_left_corner_h:bottom_right_corner_h, top_left_corner_w:bottom_right_corner_w] = images[j][i]
 
@@ -70,13 +71,13 @@ def retarget_video(gan, input_tensor, scales, must_divide, output_dir_path):
     frame_shape = np.uint32(np.array(input_tensor.shape[2:]) * max_scale)
     frame_shape[0] += (frame_shape[0] % 2)
     frame_shape[1] += (frame_shape[1] % 2)
-    frames = np.zeros([len(scales), frame_shape[0], frame_shape[1], 3])
-    for i, (scale_h, scale_w) in enumerate(scales):
+    frames = np.zeros([len(scales[0]), frame_shape[0], frame_shape[1], 3])
+    for i, (scale_h, scale_w) in enumerate(zip(*scales)):
         output_image = test_one_scale(gan, input_tensor, [scale_h, scale_w], must_divide)
         frames[i, 0:output_image.shape[0], 0:output_image.shape[1], :] = output_image
     writer = FFmpegWriter(output_dir_path + '/vid.mp4', verbosity=1, outputdict={'-b': '30000000', '-r': '100.0'})
 
-    for i, _ in enumerate(scales):
+    for i, _ in enumerate(zip(*scales)):
         for j in range(3):
             writer.writeFrame(frames[i, :, :, :])
     writer.close()
@@ -120,8 +121,7 @@ def define_video_scales(scales):
                         np.linspace(max_h, max_h, frames_per_resize),
                         np.linspace(max_h, min_h, 2 * frames_per_resize),
                         np.linspace(min_h, min_h, 2 * frames_per_resize)])
-
-    return zip(x, y)
+    return x, y
 
 
 def generate_collage_and_outputs(conf, gan, input_tensor):
@@ -193,7 +193,7 @@ def test_homo(conf, gan, input_tensor, must_divide=8):
 
                     Image.fromarray(out, 'RGB').save(conf.output_dir_path + '/scale_%02d_%02d_transform %s_ingan.png' % (int(10*scale1), int(10*scale2), shift_str))
                     # Image.fromarray(regular_out, 'RGB').save(conf.output_dir_path + '/scale_%02d_%02d_transform %s_ref.png' % (scale1, scale2, shift_str))
-                    print ind, '/', total, 'scale:', scale, 'shift:', shifts
+                    print(ind, '/', total, 'scale:', scale, 'shift:', shifts)
 
 
 def main():
@@ -213,7 +213,7 @@ def main():
         if conf.test_non_rect:
             test_homo(conf, gan, input_tensor)
 
-        print 'Done with %s' % conf.input_image_path
+        print('Done with %s' % conf.input_image_path)
 
     except KeyboardInterrupt:
         raise
