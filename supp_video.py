@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import util
 from InGAN import InGAN
 from configs import Config
@@ -93,10 +95,11 @@ def generate_full_video(video_script, frame_shape):
                 cur_scene_script_param = scene_script_param[:]
                 if scene_script_param[1] is None:
                     cur_scene_script_param[1] = cur_frame_shape[0] * 1.0 / input_tensor.shape[2]
-                    print 'max scale vertical:', cur_scene_script_param[1]
+                    print('max scale vertical:', cur_scene_script_param[1])
                 if cur_scene_script_param[3] is None:
                     cur_scene_script_param[3] = cur_frame_shape[1] * 1.0 / input_tensor.shape[3]
-                    print 'max scale horizontal:', cur_scene_script_param[3]
+                    print('max scale horizontal:', cur_scene_script_param[3])
+    irint(type(images))
 
                 scene_script = make_scene_script(scene_script_name, *cur_scene_script_param)
 
@@ -106,7 +109,7 @@ def generate_full_video(video_script, frame_shape):
                 scene = generate_one_scene(gan, input_tensor, scene_script, np.array([cur_frame_shape[0], cur_frame_shape[1]]), center)
                 partial_screen_scenes.append(scene)
 
-                print 'Done with %s,  (scene %d/%d)' % (name, i + 1, n_scenes)
+                print('Done with %s,  (scene %d/%d)' % (name, i + 1, n_scenes))
 
 
             scene = np.concatenate(partial_screen_scenes, axis=concat_axis) if len(partial_screen_scenes) > 1 else partial_screen_scenes[0]

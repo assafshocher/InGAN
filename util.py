@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import numpy as np
 from PIL import Image
 from matplotlib import pyplot as plt, gridspec
@@ -5,7 +7,6 @@ import os
 import glob
 from time import strftime, localtime
 from shutil import copy
-from scipy.misc import imresize
 import torch
 
 
@@ -83,7 +84,8 @@ def image_concat(g_preds, d_preds=None, size=None):
         dsize = g_pred.shape[1] if size is None or size[1] is None else size[1]
         result = np.ones([(1 + (d_pred is not None)) * hsize, dsize, 3]) * 255
         if d_pred is not None:
-            d_pred_new = imresize((np.concatenate([d_pred] * 3, 2) - 128) * 2, g_pred.shape[0:2], interp='nearest')
+            #d_pred_new = imresize((np.concatenate([d_pred] * 3, 2) - 128) * 2, g_pred.shape[0:2], interp='nearest')
+            d_pred_new = np.array(Image.fromarray((np.concatenate([d_pred] * 3, 2) - 128) * 2).resize(g_pred.shape[0:2], Image.NEAREST))
             result[hsize-g_pred.shape[0]:hsize+g_pred.shape[0], :g_pred.shape[1], :] = np.concatenate([g_pred,
                                                                                                        d_pred_new], 0)
         else:

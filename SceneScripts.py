@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import numpy as np
 
 
@@ -188,7 +190,7 @@ def make_scene_script(script_name, min_v, max_v, min_h, max_h, max_t, repeat, sh
     elif script_name == 'random':
         stops = np.random.rand(10, 4) * np.array([max_v-min_v, max_h-min_h, 2*max_t, 2*max_t])[None, :] + np.array([min_v, min_h, -max_t, -max_t])[None, :]
         stops = np.vstack([stops, [1, 1, 0, 0]])
-        print stops
+        print(stops)
 
         size_v = np.concatenate([l(stop_0[0], stop_1[0], frames_per_resize)
                                  for stop_0, stop_1 in zip(np.vstack(([1, 1, 0, 0], stops)), stops)])
@@ -207,7 +209,7 @@ def make_scene_script(script_name, min_v, max_v, min_h, max_h, max_t, repeat, sh
         stops_l[-1] = 0
         stops_r = np.random.rand(11) * max_t * (stops_l / np.abs(stops_l))
         stops = zip(stops_l, stops_r)
-        print stops
+        print(stops)
 
         size_h = np.concatenate([
             l(1, 1, 20 * frames_per_resize)])

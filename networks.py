@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as f
@@ -34,13 +36,13 @@ class LocalNorm(nn.Module):
 
     def forward(self, input_tensor):
         local_mean = self.get_local_mean(input_tensor)
-        print local_mean
+        print(local_mean)
         centered_input_tensor = input_tensor - local_mean
-        print centered_input_tensor
+        print(centered_input_tensor)
         squared_diff = centered_input_tensor ** 2
-        print squared_diff
+        print(squared_diff)
         local_std = self.get_var(squared_diff) ** 0.5
-        print local_std
+        print(local_std)
         normalized_tensor = centered_input_tensor / (local_std + 1e-8)
 
         return normalized_tensor # * self.weight[None, :, None, None] + self.bias[None, :, None, None]
