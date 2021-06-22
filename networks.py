@@ -34,13 +34,13 @@ class LocalNorm(nn.Module):
 
     def forward(self, input_tensor):
         local_mean = self.get_local_mean(input_tensor)
-        print local_mean
+        print(local_mean)
         centered_input_tensor = input_tensor - local_mean
-        print centered_input_tensor
+        print(centered_input_tensor)
         squared_diff = centered_input_tensor ** 2
-        print squared_diff
+        print(squared_diff)
         local_std = self.get_var(squared_diff) ** 0.5
-        print local_std
+        print(local_std)
         normalized_tensor = centered_input_tensor / (local_std + 1e-8)
 
         return normalized_tensor # * self.weight[None, :, None, None] + self.bias[None, :, None, None]
@@ -258,7 +258,7 @@ class MultiScaleDiscriminator(nn.Module):
         map_size = aggregated_result_maps_from_all_scales.shape[2:]
 
         # Run all nets over all scales and aggregate the interpolated results
-        for net, scale_weight, i in zip(self.nets[1:], scale_weights[1:], range(1, len(scale_weights))):
+        for net, scale_weight, i in zip(self.nets[1:], scale_weights[1:], list(range(1, len(scale_weights)))):
             downscaled_image = f.interpolate(input_tensor, scale_factor=self.scale_factor**(-i), mode='bilinear')
             result_map_for_current_scale = net(downscaled_image)
             upscaled_result_map_for_current_scale = f.interpolate(result_map_for_current_scale,
@@ -279,7 +279,7 @@ class RescaleBlock(nn.Module):
 
         in_channel_power = scale > 1
         out_channel_power = scale < 1
-        i_range = range(n_layers) if scale < 1 else range(n_layers-1, -1, -1)
+        i_range = list(range(n_layers)) if scale < 1 else list(range(n_layers-1, -1, -1))
 
         for i in i_range:
             self.conv_layers[i] = nn.Sequential(nn.ReflectionPad2d(1),

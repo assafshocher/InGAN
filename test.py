@@ -74,6 +74,8 @@ def retarget_video(gan, input_tensor, scales, must_divide, output_dir_path):
     for i, (scale_h, scale_w) in enumerate(scales):
         output_image = test_one_scale(gan, input_tensor, [scale_h, scale_w], must_divide)
         frames[i, 0:output_image.shape[0], 0:output_image.shape[1], :] = output_image
+    from IPython.core.debugger import set_trace
+    set_trace()
     writer = FFmpegWriter(output_dir_path + '/vid.mp4', verbosity=1, outputdict={'-b': '30000000', '-r': '100.0'})
 
     for i, _ in enumerate(scales):
@@ -121,7 +123,7 @@ def define_video_scales(scales):
                         np.linspace(max_h, min_h, 2 * frames_per_resize),
                         np.linspace(min_h, min_h, 2 * frames_per_resize)])
 
-    return zip(x, y)
+    return list(zip(x, y))
 
 
 def generate_collage_and_outputs(conf, gan, input_tensor):
@@ -193,7 +195,7 @@ def test_homo(conf, gan, input_tensor, must_divide=8):
 
                     Image.fromarray(out, 'RGB').save(conf.output_dir_path + '/scale_%02d_%02d_transform %s_ingan.png' % (int(10*scale1), int(10*scale2), shift_str))
                     # Image.fromarray(regular_out, 'RGB').save(conf.output_dir_path + '/scale_%02d_%02d_transform %s_ref.png' % (scale1, scale2, shift_str))
-                    print ind, '/', total, 'scale:', scale, 'shift:', shifts
+                    print((ind, '/', total, 'scale:', scale, 'shift:', shifts))
 
 
 def main():
@@ -213,7 +215,7 @@ def main():
         if conf.test_non_rect:
             test_homo(conf, gan, input_tensor)
 
-        print 'Done with %s' % conf.input_image_path
+        print(('Done with %s' % conf.input_image_path))
 
     except KeyboardInterrupt:
         raise

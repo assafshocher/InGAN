@@ -30,7 +30,7 @@ for i in range(conf.max_iters + 1):
     except KeyboardInterrupt:
         raise
     except Exception as e:
-        print 'Something went wrong in iteration %d, While training.' % i
+        print('Something went wrong in iteration %d, While training.' % i)
         print_exc()
 
     # Take care of all testing, saving and presenting of current results and status
@@ -39,7 +39,7 @@ for i in range(conf.max_iters + 1):
     except KeyboardInterrupt:
         raise
     except Exception as e:
-        print 'Something went wrong in iteration %d, While testing or visualizing.' % i
+        print('Something went wrong in iteration %d, While testing or visualizing.' % i)
         print_exc()
 
     # Save snapshot when needed
@@ -53,5 +53,5 @@ for i in range(conf.max_iters + 1):
     except KeyboardInterrupt:
         raise
     except Exception as e:
-        print 'Something went wrong in iteration %d, While saving snapshot.' % i
+        print('Something went wrong in iteration %d, While saving snapshot.' % i)
         print_exc()

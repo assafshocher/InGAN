@@ -5,7 +5,7 @@ import os
 import glob
 from time import strftime, localtime
 from shutil import copy
-from scipy.misc import imresize
+# from scipy.misc import imresize
 import torch
 
 
@@ -83,9 +83,12 @@ def image_concat(g_preds, d_preds=None, size=None):
         dsize = g_pred.shape[1] if size is None or size[1] is None else size[1]
         result = np.ones([(1 + (d_pred is not None)) * hsize, dsize, 3]) * 255
         if d_pred is not None:
-            d_pred_new = imresize((np.concatenate([d_pred] * 3, 2) - 128) * 2, g_pred.shape[0:2], interp='nearest')
-            result[hsize-g_pred.shape[0]:hsize+g_pred.shape[0], :g_pred.shape[1], :] = np.concatenate([g_pred,
-                                                                                                       d_pred_new], 0)
+            img = (np.concatenate([d_pred] * 3, 2) - 128) * 2
+            import cv2
+            # d_pred_new = imresize(img, g_pred.shape[0:2], interp='nearest')
+            d_pred_new = cv2.resize(img, dsize=g_pred.shape[0:2][::-1], interpolation=cv2.INTER_NEAREST)
+            con = np.concatenate([g_pred, d_pred_new], 0)
+            result[hsize-g_pred.shape[0]:hsize+g_pred.shape[0], :g_pred.shape[1], :] = con
         else:
             result[hsize - g_pred.shape[0]:, :, :] = g_pred
         results.append(np.uint8(np.round(result)))
@@ -177,13 +180,13 @@ class Visualizer:
                 self.Rec_loss[i-self.conf.print_freq:i] = self.gan.losses_G_reconstruct.detach().cpu().float().numpy().tolist()
 
             if self.conf.reconstruct_loss_stop_iter < i:
-                print('iter: %d, G_loss: %f, D_loss_real: %f, D_loss_fake: %f, LR: %f' %
+                print(('iter: %d, G_loss: %f, D_loss_real: %f, D_loss_fake: %f, LR: %f' %
                       (i, self.G_loss[i-1], self.D_loss_real[i-1], self.D_loss_fake[i-1],
-                       self.gan.lr_scheduler_G.get_lr()[0]))
+                       self.gan.lr_scheduler_G.get_lr()[0])))
             else:
-                print('iter: %d, G_loss: %f, D_loss_real: %f, D_loss_fake: %f, Rec_loss: %f, LR: %f' %
+                print(('iter: %d, G_loss: %f, D_loss_real: %f, D_loss_fake: %f, Rec_loss: %f, LR: %f' %
                       (i, self.G_loss[i-1], self.D_loss_real[i-1], self.D_loss_fake[i-1], self.Rec_loss[i-1],
-                       self.gan.lr_scheduler_G.get_lr()[0]))
+                       self.gan.lr_scheduler_G.get_lr()[0])))
 
         if not i % self.conf.display_freq and i > 0:
             plt.gcf().clear()
@@ -210,13 +213,13 @@ class Visualizer:
             input_size = self.gan.input_tensor_noised.shape[2:]
 
             result = image_concat(tensor2im(g_preds), tensor2im(d_preds), (input_size[0]*2, input_size[1]*2))
-            self.plot_gan_loss[0].set_data(range(i), self.G_loss[:i])
-            self.plot_gan_loss[1].set_data(range(i), self.D_loss_real[:i])
-            self.plot_gan_loss[2].set_data(range(i), self.D_loss_fake[:i])
+            self.plot_gan_loss[0].set_data(list(range(i)), self.G_loss[:i])
+            self.plot_gan_loss[1].set_data(list(range(i)), self.D_loss_real[:i])
+            self.plot_gan_loss[2].set_data(list(range(i)), self.D_loss_fake[:i])
             self.gan_loss.set_xlim(0, i)
 
             if self.conf.reconstruct_loss_stop_iter > i:
-                self.plot_reconstruct_loss[0].set_data(range(i), self.Rec_loss[:i])
+                self.plot_reconstruct_loss[0].set_data(list(range(i)), self.Rec_loss[:i])
                 self.reconstruct_loss.set_ylim(np.min(self.Rec_loss[:i]), np.max(self.Rec_loss[:i]))
                 self.reconstruct_loss.set_xlim(0, i)
 
@@ -245,7 +248,6 @@ def prepare_result_dir(conf):
         if conf.resume:
             copy(conf.resume, os.path.join(conf.output_dir_path, 'starting_checkpoint.pth.tar'))
     return conf.output_dir_path
-
 
 
 def homography_based_on_top_corners_x_shift(rand_h):

@@ -134,7 +134,7 @@ class InGAN:
         if len(missing):
             warnings.warn('Missing the following state dicts from checkpoint: {}'.format(', '.join(missing)))
 
-        print('resuming checkpoint {}'.format(self.conf.resume))
+        print(('resuming checkpoint {}'.format(self.conf.resume)))
 
     def test(self, input_tensor, output_size, rand_affine, input_size, run_d_pred=True, run_reconstruct=True):
         with torch.no_grad():
