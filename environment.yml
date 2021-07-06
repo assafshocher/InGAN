@@ -3,12 +3,12 @@ channels:
   - pytorch
   - defaults
 dependencies:
-  - cudatoolkit>=10.1
+  - cudatoolkit>=10.2
   - numpy
   - pillow
   - pip
-  - python>=3.7.3
-  - pytorch>=1.4.0
+  - python>=3.8.10
+  - pytorch>=1.9.0
   - torchvision>=0.4
   - scipy
   - scikit-learn
@@ -16,3 +16,4 @@ dependencies:
   - pip:
     - opencv-python
     - ipython
+    - pytest

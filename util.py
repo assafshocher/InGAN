@@ -48,13 +48,13 @@ def tensor2im(image_tensors, imtype=np.uint8):
     return image_numpys
 
 
-def im2tensor(image_numpy, int_flag=False):
+def im2tensor(image_numpy, int_flag=False, device=torch.device('cuda')):
     # the int flag indicates whether the input image is integer (and [0,255]) or float ([0,1])
     if int_flag:
         image_numpy /= 255.0
     # Undo the tensor shifting (see tensor2im function)
     transformed_image = np.transpose(image_numpy, (2, 0, 1)) * 2.0 - 1.0
-    return torch.FloatTensor(transformed_image).unsqueeze(0).cuda()
+    return torch.FloatTensor(transformed_image).unsqueeze(0).to(device)
 
 
 def random_size(orig_size, curriculum=True, i=None, iter_for_max_range=None, must_divide=8.0,

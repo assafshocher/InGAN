@@ -1,3 +1,4 @@
+**ported to Python 3.8 and PyTorch 1.9**
 # InGAN
 ### Official code for the paper "InGAN: Capturing and Retargeting the DNA of a Natural Image"
 
