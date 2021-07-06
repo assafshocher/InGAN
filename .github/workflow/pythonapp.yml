@@ -1,0 +1,34 @@
+name: Python conda test
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: conda-incubator/setup-miniconda@v2
+      with:
+         miniconda-version: "latest"
+         activate-environment: ingan
+         environment-file: environment.yml
+         python-version: 3.8
+         auto-activate-base: false
+    - shell: bash -l {0}
+      run: |
+        conda info
+        conda list
+    - name: Test with pytest
+      shell: bash -l {0}
+      run: |
+        pytest .
+    - name: yapf
+      id: yapf
+      uses: diegovalenzuelaiturra/yapf-action@v0.0.1
+      with:
+        args: . --recursive --diff
+    - name: Fail if yapf made changes
+      if: steps.yapf.outputs.exit-code == 2
+      run: exit 1
