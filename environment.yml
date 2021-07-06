@@ -17,3 +17,4 @@ dependencies:
     - opencv-python
     - ipython
     - pytest
+    - yapf
