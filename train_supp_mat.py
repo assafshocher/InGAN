@@ -41,7 +41,10 @@ def main():
     for imgname in os.listdir(base_dir):
         full_img_name = os.path.join(base_dir, imgname)
         short_name = os.path.splitext(imgname)[0]
-        cmd = ['python', 'train.py', '--input_image_path', full_img_name, '--gpu_id', '0']
+        cmd = [
+            'python', 'train.py', '--input_image_path', full_img_name,
+            '--gpu_id', '0'
+        ]
         for aname, aa in list(abl_args.items()):
             exp_name = '{}_{}'.format(short_name, aname)
             full_cmd = cmd + aa + ['--name', exp_name]

@@ -13,6 +13,7 @@ def test_image():
 
 
 def test_tensor2im(test_image):
-    tensor = torch.tensor(test_image).permute(2, 0, 1).unsqueeze(0) / 255. * 2 - 1
+    tensor = torch.tensor(test_image).permute(2, 0,
+                                              1).unsqueeze(0) / 255. * 2 - 1
     img = tensor2im(tensor)
     assert np.allclose(img, test_image)

@@ -4,7 +4,6 @@ import os
 from util import Visualizer, read_data
 from traceback import print_exc
 
-
 # Load configuration
 conf = Config().parse()
 
@@ -39,19 +38,26 @@ for i in range(conf.max_iters + 1):
     except KeyboardInterrupt:
         raise
     except Exception as e:
-        print('Something went wrong in iteration %d, While testing or visualizing.' % i)
+        print(
+            'Something went wrong in iteration %d, While testing or visualizing.'
+            % i)
         print_exc()
 
     # Save snapshot when needed
     try:
         if i > 0 and not i % conf.save_snapshot_freq:
-            gan.save(os.path.join(conf.output_dir_path, 'checkpoint_%07d.pth.tar' % i))
+            gan.save(
+                os.path.join(conf.output_dir_path,
+                             'checkpoint_%07d.pth.tar' % i))
             del gan
             gan = InGAN(conf)
-            gan.resume(os.path.join(conf.output_dir_path, 'checkpoint_%07d.pth.tar' % i))
+            gan.resume(
+                os.path.join(conf.output_dir_path,
+                             'checkpoint_%07d.pth.tar' % i))
             visualizer.gan = gan
     except KeyboardInterrupt:
         raise
     except Exception as e:
-        print('Something went wrong in iteration %d, While saving snapshot.' % i)
+        print('Something went wrong in iteration %d, While saving snapshot.' %
+              i)
         print_exc()

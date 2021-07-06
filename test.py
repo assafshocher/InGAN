@@ -6,7 +6,10 @@ from InGAN import InGAN
 from configs import Config
 from traceback import print_exc
 from networks import GeoTransform
-from non_rect import (apply_resize_and_radial, homography_based_on_top_corners_x_shift, apply_resize_and_homograhpy, homography_grid, apply_resize_and_affine)
+from non_rect import (apply_resize_and_radial,
+                      homography_based_on_top_corners_x_shift,
+                      apply_resize_and_homograhpy, homography_grid,
+                      apply_resize_and_affine)
 
 
 def test_one_scale(gan,
