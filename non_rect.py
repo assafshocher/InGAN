@@ -9,16 +9,14 @@ def affine_based_on_top_left_corner_x_shift(rand_affine):
     :param sig: amount of random x perturbation
     :return: forward and backward affine transforms
     """
-    aff = np.array([[1., -0.5 * rand_affine, 0.5 * rand_affine], [0, 1., 0]],
-                   dtype=np.float32)
+    aff = np.array([[1., -0.5 * rand_affine, 0.5 * rand_affine], [0, 1., 0]], dtype=np.float32)
 
     return torch.from_numpy(aff).clone().cuda()
 
 
 def apply_resize_and_affine(x, target_size, rand_affine):
     aff = affine_based_on_top_left_corner_x_shift(rand_affine)
-    target_size4d = torch.Size(
-        [x.shape[0], x.shape[1], target_size[0], target_size[1]])
+    target_size4d = torch.Size([x.shape[0], x.shape[1], target_size[0], target_size[1]])
     grid = f.affine_grid(aff.expand(x.shape[0], -1, -1), target_size4d)
     out = f.grid_sample(x, grid, mode='bilinear', padding_mode='border')
     return out
@@ -37,8 +35,7 @@ def homography_grid(theta, size):
     Returns:
         output (Tensor): output Tensor of size (:math:`N \times H \times W \times 2`)
     """
-    y, x = torch.meshgrid(
-        (torch.linspace(-1., 1., size[-2]), torch.linspace(-1., 1., size[-1])))
+    y, x = torch.meshgrid((torch.linspace(-1., 1., size[-2]), torch.linspace(-1., 1., size[-1])))
     n = size[-2] * size[-1]
     hxy = torch.ones(n, 3, dtype=torch.float)
     hxy[:, 0] = x.contiguous().view(-1)
@@ -51,8 +48,7 @@ def homography_grid(theta, size):
 
 def apply_resize_and_homograhpy(x, target_size, rand_h):
     theta = homography_based_on_top_corners_x_shift(rand_h)
-    target_size4d = torch.Size(
-        [x.shape[0], x.shape[1], target_size[0], target_size[1]])
+    target_size4d = torch.Size([x.shape[0], x.shape[1], target_size[0], target_size[1]])
     grid = homography_grid(theta.expand(x.shape[0], -1, -1), target_size4d)
     out = f.grid_sample(x, grid, mode='bilinear', padding_mode='border')
     return out
@@ -71,15 +67,14 @@ def homography_based_on_top_corners_x_shift(rand_h):
     #               [0, 0, 0, 0, 0, 0, 0, 0, 1]], dtype=np.float32)
     # play with top left and bottom right
     p = np.array(
-        [[
-            1., 1., -1, 0, 0, 0, -(-1. + rand_h[0]), -(-1. + rand_h[0]),
-            -1. + rand_h[0]
-        ], [0, 0, 0, 1., 1., -1., 1., 1., -1.],
-         [-1., -1., -1, 0, 0, 0, 1 + rand_h[1], 1 + rand_h[1], 1 + rand_h[1]],
-         [0, 0, 0, -1, -1, -1, 1, 1, 1], [1, 0, -1, 0, 0, 0, 1, 0, -1],
-         [0, 0, 0, 1, 0, -1, 0, 0, 0], [-1, 0, -1, 0, 0, 0, 1, 0, 1],
-         [0, 0, 0, -1, 0, -1, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1]],
-        dtype=np.float32)
+        [
+            [1., 1., -1, 0, 0, 0, -(-1. + rand_h[0]), -(-1. + rand_h[0]), -1. + rand_h[0]],
+            [0, 0, 0, 1., 1., -1., 1., 1., -1.], [-1., -1., -1, 0, 0, 0, 1 + rand_h[1], 1 + rand_h[1], 1 + rand_h[1]],
+            [0, 0, 0, -1, -1, -1, 1, 1, 1], [1, 0, -1, 0, 0, 0, 1, 0, -1], [0, 0, 0, 1, 0, -1, 0, 0, 0],
+            [-1, 0, -1, 0, 0, 0, 1, 0, 1], [0, 0, 0, -1, 0, -1, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1]
+        ],
+        dtype=np.float32
+    )
     b = np.zeros((9, 1), dtype=np.float32)
     b[8, 0] = 1.
     h = np.dot(np.linalg.inv(p), b)
@@ -87,17 +82,14 @@ def homography_based_on_top_corners_x_shift(rand_h):
 
 
 def apply_resize_and_radial(x, target_size, rand_r):
-    target_size4d = torch.Size(
-        [x.shape[0], x.shape[1], target_size[0], target_size[1]])
+    target_size4d = torch.Size([x.shape[0], x.shape[1], target_size[0], target_size[1]])
     grid = make_radial_scale_grid(rand_r, target_size4d)
     out = f.grid_sample(x, grid, mode='bilinear', padding_mode='border')
     return out
 
 
 def make_radial_scale_grid(rand_r, size4d):
-    y, x = torch.meshgrid(
-        (torch.linspace(-1., 1.,
-                        size4d[-2]), torch.linspace(-1., 1., size4d[-1])))
+    y, x = torch.meshgrid((torch.linspace(-1., 1., size4d[-2]), torch.linspace(-1., 1., size4d[-1])))
     theta = torch.atan2(x, y)
     r = torch.sqrt()
 

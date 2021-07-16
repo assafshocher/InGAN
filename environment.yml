@@ -15,6 +15,7 @@ dependencies:
   - seaborn
   - pip:
     - opencv-python
+    - scikit-video
     - ipython
     - pytest
     - yapf
