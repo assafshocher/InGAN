@@ -1,12 +1,17 @@
-from networks import GeoTransform
+import os
+import torch
+import numpy as np
 from PIL import Image
+from skvideo.io import FFmpegWriter
 import util
 from InGAN import InGAN
 from configs import Config
 from traceback import print_exc
-from skvideo.io import FFmpegWriter
-import os
-from non_rect import *
+from networks import GeoTransform
+from non_rect import (
+    apply_resize_and_radial, homography_based_on_top_corners_x_shift, apply_resize_and_homograhpy, homography_grid,
+    apply_resize_and_affine
+)
 
 
 def test_one_scale(gan, input_tensor, scale, must_divide, affine=None, return_tensor=False, size_instead_scale=False):
@@ -15,15 +20,19 @@ def test_one_scale(gan, input_tensor, scale, must_divide, affine=None, return_te
         if size_instead_scale:
             out_size = scale
         else:
-            out_size = (np.uint32(np.floor(scale[0] * in_size[0] * 1.0 / must_divide) * must_divide),
-                        np.uint32(np.floor(scale[1] * in_size[1] * 1.0 / must_divide) * must_divide))
+            out_size = (
+                np.uint32(np.floor(scale[0] * in_size[0] * 1.0 / must_divide) * must_divide),
+                np.uint32(np.floor(scale[1] * in_size[1] * 1.0 / must_divide) * must_divide)
+            )
 
-        output_tensor, _, _ = gan.test(input_tensor=input_tensor,
-                                       input_size=in_size,
-                                       output_size=out_size,
-                                       rand_affine=affine,
-                                       run_d_pred=False,
-                                       run_reconstruct=False)
+        output_tensor, _, _ = gan.test(
+            input_tensor=input_tensor,
+            input_size=in_size,
+            output_size=out_size,
+            rand_affine=affine,
+            run_d_pred=False,
+            run_reconstruct=False
+        )
         if return_tensor:
             return output_tensor[1]
         else:
@@ -31,7 +40,7 @@ def test_one_scale(gan, input_tensor, scale, must_divide, affine=None, return_te
 
 
 def concat_images(images, margin, input_spot):
-    h_sizes = [im.shape[0] for im in zip(*images)[0]]
+    h_sizes = [im.shape[0] for im in list(zip(*images))[0]]
     w_sizes = [im.shape[1] for im in images[0]]
     h_total_size = np.sum(h_sizes) + margin * (len(images) - 1)
     w_total_size = np.sum(w_sizes) + margin * (len(images) - 1)
@@ -45,9 +54,8 @@ def concat_images(images, margin, input_spot):
             bottom_right_corner_w = int(top_left_corner_w + w_sizes[i])
 
             if [i, j] == input_spot:
-                collage[top_left_corner_h - margin/2: bottom_right_corner_h + margin/2,
-                        top_left_corner_w - margin/2: bottom_right_corner_w + margin/2,
-                        :] = [255, 0, 0]
+                collage[top_left_corner_h - margin // 2:bottom_right_corner_h + margin // 2,
+                        top_left_corner_w - margin // 2:bottom_right_corner_w + margin // 2, :] = [255, 0, 0]
             collage[top_left_corner_h:bottom_right_corner_h, top_left_corner_w:bottom_right_corner_w] = images[j][i]
 
     return collage
@@ -86,42 +94,48 @@ def define_video_scales(scales):
     max_v, min_v, max_h, min_h = scales
     frames_per_resize = 10
 
-    x = np.concatenate([
-                        np.linspace(1, max_v, frames_per_resize),
-                        np.linspace(max_v, min_v, 2 * frames_per_resize),
-                        np.linspace(min_v, max_v, 2 * frames_per_resize),
-                        np.linspace(max_v, 1, frames_per_resize),
-                        np.linspace(1, 1, frames_per_resize),
-                        np.linspace(1, 1, 2 * frames_per_resize),
-                        np.linspace(1, 1, 2 * frames_per_resize),
-                        np.linspace(1, 1, frames_per_resize),
-                        np.linspace(1, max_v, frames_per_resize),
-                        np.linspace(max_v, min_v, 2 * frames_per_resize),
-                        np.linspace(min_v, max_v, 2 * frames_per_resize),
-                        np.linspace(max_v, 1, frames_per_resize),
-                        np.linspace(1, 1, frames_per_resize),
-                        np.linspace(1, max_v, frames_per_resize),
-                        np.linspace(max_v, max_v, 2 * frames_per_resize),
-                        np.linspace(max_v, min_v, 2 * frames_per_resize)])
-    y = np.concatenate([
-                        np.linspace(1, 1, frames_per_resize),
-                        np.linspace(1, 1, 2 * frames_per_resize),
-                        np.linspace(1, 1, 2 * frames_per_resize),
-                        np.linspace(1, 1, frames_per_resize),
-                        np.linspace(1, max_h, frames_per_resize),
-                        np.linspace(max_h, min_h, 2 * frames_per_resize),
-                        np.linspace(min_h, max_h, 2 * frames_per_resize),
-                        np.linspace(max_h, 1, frames_per_resize),
-                        np.linspace(1, max_h, frames_per_resize),
-                        np.linspace(max_h, min_h, 2 * frames_per_resize),
-                        np.linspace(min_h, max_h, 2 * frames_per_resize),
-                        np.linspace(max_h, 1, frames_per_resize),
-                        np.linspace(1, max_h, frames_per_resize),
-                        np.linspace(max_h, max_h, frames_per_resize),
-                        np.linspace(max_h, min_h, 2 * frames_per_resize),
-                        np.linspace(min_h, min_h, 2 * frames_per_resize)])
+    x = np.concatenate(
+        [
+            np.linspace(1, max_v, frames_per_resize),
+            np.linspace(max_v, min_v, 2 * frames_per_resize),
+            np.linspace(min_v, max_v, 2 * frames_per_resize),
+            np.linspace(max_v, 1, frames_per_resize),
+            np.linspace(1, 1, frames_per_resize),
+            np.linspace(1, 1, 2 * frames_per_resize),
+            np.linspace(1, 1, 2 * frames_per_resize),
+            np.linspace(1, 1, frames_per_resize),
+            np.linspace(1, max_v, frames_per_resize),
+            np.linspace(max_v, min_v, 2 * frames_per_resize),
+            np.linspace(min_v, max_v, 2 * frames_per_resize),
+            np.linspace(max_v, 1, frames_per_resize),
+            np.linspace(1, 1, frames_per_resize),
+            np.linspace(1, max_v, frames_per_resize),
+            np.linspace(max_v, max_v, 2 * frames_per_resize),
+            np.linspace(max_v, min_v, 2 * frames_per_resize)
+        ]
+    )
+    y = np.concatenate(
+        [
+            np.linspace(1, 1, frames_per_resize),
+            np.linspace(1, 1, 2 * frames_per_resize),
+            np.linspace(1, 1, 2 * frames_per_resize),
+            np.linspace(1, 1, frames_per_resize),
+            np.linspace(1, max_h, frames_per_resize),
+            np.linspace(max_h, min_h, 2 * frames_per_resize),
+            np.linspace(min_h, max_h, 2 * frames_per_resize),
+            np.linspace(max_h, 1, frames_per_resize),
+            np.linspace(1, max_h, frames_per_resize),
+            np.linspace(max_h, min_h, 2 * frames_per_resize),
+            np.linspace(min_h, max_h, 2 * frames_per_resize),
+            np.linspace(max_h, 1, frames_per_resize),
+            np.linspace(1, max_h, frames_per_resize),
+            np.linspace(max_h, max_h, frames_per_resize),
+            np.linspace(max_h, min_h, 2 * frames_per_resize),
+            np.linspace(min_h, min_h, 2 * frames_per_resize)
+        ]
+    )
 
-    return zip(x, y)
+    return list(zip(x, y))
 
 
 def generate_collage_and_outputs(conf, gan, input_tensor):
@@ -149,7 +163,7 @@ def _make_homography_mask(in_mask, target_size, rand_h):
 
 def test_homo(conf, gan, input_tensor, must_divide=8):
     shift_range = np.arange(conf.non_rect_shift_range[0], conf.non_rect_shift_range[1], conf.non_rect_shift_range[2])
-    total = (len(conf.non_rect_scales)*len(shift_range))**2
+    total = (len(conf.non_rect_scales) * len(shift_range))**2
     ind = 0
     for scale1 in conf.non_rect_scales:
         for scale2 in conf.non_rect_scales:
@@ -159,7 +173,11 @@ def test_homo(conf, gan, input_tensor, must_divide=8):
                     ind += 1
                     shifts = (shift1, shift2)
                     sz = input_tensor.shape
-                    out_pad = np.uint8(255*np.ones([np.uint32(np.floor(sz[2]*scale[0])), np.uint32(np.floor(3*sz[3]*scale[1])), 3]))
+                    out_pad = np.uint8(
+                        255 *
+                        np.ones([np.uint32(np.floor(sz[2] * scale[0])),
+                                 np.uint32(np.floor(3 * sz[3] * scale[1])), 3])
+                    )
 
                     pad_l = np.abs(np.int(np.ceil(sz[3] * shifts[0])))
                     pad_r = np.abs(np.int(np.ceil(sz[3] * shifts[1])))
@@ -169,31 +187,46 @@ def test_homo(conf, gan, input_tensor, must_divide=8):
 
                     in_size = in_mask.shape[2:]
 
-                    out_size = (np.uint32(np.floor(scale[0] * in_size[0] * 1.0 / must_divide) * must_divide),
-                                np.uint32(np.floor(scale[1] * in_size[1] * 1.0 / must_divide) * must_divide))
+                    out_size = (
+                        np.uint32(np.floor(scale[0] * in_size[0] * 1.0 / must_divide) * must_divide),
+                        np.uint32(np.floor(scale[1] * in_size[1] * 1.0 / must_divide) * must_divide)
+                    )
 
                     if pad_r > 0:
-                        in_mask[:,:, :, pad_l:-pad_r] = torch.ones_like(input_tensor)
+                        in_mask[:, :, :, pad_l:-pad_r] = torch.ones_like(input_tensor)
                         input_for_regular[:, :, :, pad_l:-pad_r] = input_tensor
                     else:
                         in_mask[:, :, :, pad_l:] = torch.ones_like(input_tensor)
                         input_for_regular[:, :, :, pad_l:] = input_tensor
 
-                    out = test_one_scale(gan, input_tensor, out_size, conf.must_divide, affine=shifts, return_tensor=True, size_instead_scale=True)
+                    out = test_one_scale(
+                        gan,
+                        input_tensor,
+                        out_size,
+                        conf.must_divide,
+                        affine=shifts,
+                        return_tensor=True,
+                        size_instead_scale=True
+                    )
                     # regular = transform(input_tensor, out_size, shifts)
                     out_mask = _make_homography_mask(in_mask, out_size, shifts)
 
                     out = util.tensor2im(out_mask * out + 1 - out_mask)
                     # regular_out = util.tensor2im(out_mask * regular + 1 - out_mask)
                     # out_pad[:, sz[3] - pad_l:  sz[3] - pad_l + out_size[1], :] = out
-                    shift_str = "{1:0{0}d}_{3:0{2}d}".format(2 if shift1>=0 else 3, int(10*shift1), 2 if shift2>=0 else 3, int(10*shift2))
+                    shift_str = "{1:0{0}d}_{3:0{2}d}".format(
+                        2 if shift1 >= 0 else 3, int(10 * shift1), 2 if shift2 >= 0 else 3, int(10 * shift2)
+                    )
 
                     # out = np.rot90(out, 3)
                     # regular_out = np.rot90(regular_out, 3)
 
-                    Image.fromarray(out, 'RGB').save(conf.output_dir_path + '/scale_%02d_%02d_transform %s_ingan.png' % (int(10*scale1), int(10*scale2), shift_str))
+                    Image.fromarray(out, 'RGB').save(
+                        conf.output_dir_path + '/scale_%02d_%02d_transform %s_ingan.png' %
+                        (int(10 * scale1), int(10 * scale2), shift_str)
+                    )
                     # Image.fromarray(regular_out, 'RGB').save(conf.output_dir_path + '/scale_%02d_%02d_transform %s_ref.png' % (scale1, scale2, shift_str))
-                    print ind, '/', total, 'scale:', scale, 'shift:', shifts
+                    print((ind, '/', total, 'scale:', scale, 'shift:', shifts))
 
 
 def main():
@@ -213,7 +246,7 @@ def main():
         if conf.test_non_rect:
             test_homo(conf, gan, input_tensor)
 
-        print 'Done with %s' % conf.input_image_path
+        print(('Done with %s' % conf.input_image_path))
 
     except KeyboardInterrupt:
         raise

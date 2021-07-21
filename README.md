@@ -3,6 +3,8 @@
 
 Project page: http://www.wisdom.weizmann.ac.il/~vision/ingan/ (See our results and visual comparison to other methods)
 
+Version ported to Python 3.8 and PyTorch 1.9 by [https://github.com/Bartolo1024](https://github.com/Bartolo1024) and used in [Level generation and style enhancement - deep learning for game development overview](https://arxiv.org/abs/2107.07397).
+
 **Accepted ICCV'19 (Oral)**
 ----------
 ![](/figs/fruits.gif)

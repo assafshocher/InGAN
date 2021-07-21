@@ -6,24 +6,49 @@ import os
 from non_rect import *
 from SceneScripts import *
 
-
 FRAME_SHAPE = [500, 1000]
 MUST_DIVIDE = 8
 VIDEO_SCRIPT = [  # [nameses, script_name, script_params=(min_v, max_v, min_h, max_h, max_t, repeat)]
-[[['fruits'], ['fruits_old'], ['fruits_old'], ['fruits'], ['fruits']], ['horizontal_grow_shrink_slow', 'vertical_grow_shrink', 'resize_round', 'affine_dance', 'random'], [[0.55, None, 0.55, None, None, 1], [0.3, 1.8, 0.3, 2.0, None, 1, False], [0.3, 1.8, 0.3, 2.0, None, 1, False], [None, None, None, None, 0.45, 1, False], [0.3, 1.3, 0.3, 1.6, 0.45, 1, False]]],
-['farm_house', 'special_resize_round', [0.45, None,  0.45, None, None, 2]],
-['cab_building', 'resize_round', [0.5, None, 0.3, 2.5, None, 2]],
-['rome', 'horizontal_grow_shrink', [0.3, None, 0.3, None, None, 3]],
-[[['peacock', 'windows']], 'resize_round', [0.5, 2, 0.5, 1.75, None, 3]],
-[[['soldiers', 'penguins']], 'horizontal_grow_shrink', [0.3, None, 0.3, None, None, 3]],
-[[['nkorea', 'sapa']], 'horizontal_grow_shrink', [0.15, None, 0.15, None, None, 3]],
-[[['quilt']] * 5, ['horizontal_grow_shrink', 'vertical_grow_shrink', 'resize_round', 'affine_dance', 'random'], [[0.55, None, 0.55, None, None, 1], [0.3, None, 0.3, None, None, 1, False], [0.3, None, 0.3, None, None, 1, False], [None, None, None, None, 0.45, 1, False], [0.6, 1.6, 0.6, 1.75, 0.55, 1, False]]],
-[[['umbrella'], ['umbrella'], ['umbrella']], ['horizontal_grow_shrink', 'resize_round', 'trapezoids'], [[0.55, None, 0.55, None, None, 1], [0.55, None, 0.55, None, None, 1, False], [1, 1, 0.8, 1.2, 0.3, 1, False]]],
-[[['metal_circles']] * 5, ['vertical_grow_shrink', 'random'], [[0.15, None, 0.55, None, None, 2], [0.15, 1.8, 0.15, 1.45, 0.55, 1, False]]],
-[[['fish'], ['fish']], ['affine_dance', 'random'], [[1, 1, 1, 1, 0.4, 1], [1, 1, 1, 1, 0.5, 1, False]]],
-['wood', 'special_zoom', [0.3, None, 0.3, None, None, 2]],
-['ny', 'affine_dance', [None, None, None, None, 0.3, 2]],
-['sushi', 'resize_round', [0.5, None, 0.3, None, None, 1]],
+    [[['fruits'], ['fruits_old'], ['fruits_old'], ['fruits'], ['fruits']],
+     [
+         'horizontal_grow_shrink_slow', 'vertical_grow_shrink', 'resize_round',
+         'affine_dance', 'random'
+     ],
+     [[0.55, None, 0.55, None, None, 1], [0.3, 1.8, 0.3, 2.0, None, 1, False],
+      [0.3, 1.8, 0.3, 2.0, None, 1, False],
+      [None, None, None, None, 0.45, 1, False],
+      [0.3, 1.3, 0.3, 1.6, 0.45, 1, False]]],
+    ['farm_house', 'special_resize_round', [0.45, None, 0.45, None, None, 2]],
+    ['cab_building', 'resize_round', [0.5, None, 0.3, 2.5, None, 2]],
+    ['rome', 'horizontal_grow_shrink', [0.3, None, 0.3, None, None, 3]],
+    [[['peacock', 'windows']], 'resize_round', [0.5, 2, 0.5, 1.75, None, 3]],
+    [[['soldiers', 'penguins']], 'horizontal_grow_shrink',
+     [0.3, None, 0.3, None, None, 3]],
+    [[['nkorea', 'sapa']], 'horizontal_grow_shrink',
+     [0.15, None, 0.15, None, None, 3]],
+    [[['quilt']] * 5,
+     [
+         'horizontal_grow_shrink', 'vertical_grow_shrink', 'resize_round',
+         'affine_dance', 'random'
+     ],
+     [[0.55, None, 0.55, None, None, 1],
+      [0.3, None, 0.3, None, None, 1, False],
+      [0.3, None, 0.3, None, None, 1, False],
+      [None, None, None, None, 0.45, 1, False],
+      [0.6, 1.6, 0.6, 1.75, 0.55, 1, False]]],
+    [[['umbrella'], ['umbrella'], ['umbrella']],
+     ['horizontal_grow_shrink', 'resize_round', 'trapezoids'],
+     [[0.55, None, 0.55, None, None, 1],
+      [0.55, None, 0.55, None, None, 1, False],
+      [1, 1, 0.8, 1.2, 0.3, 1, False]]],
+    [[['metal_circles']] * 5, ['vertical_grow_shrink', 'random'],
+     [[0.15, None, 0.55, None, None, 2],
+      [0.15, 1.8, 0.15, 1.45, 0.55, 1, False]]],
+    [[['fish'], ['fish']], ['affine_dance', 'random'],
+     [[1, 1, 1, 1, 0.4, 1], [1, 1, 1, 1, 0.5, 1, False]]],
+    ['wood', 'special_zoom', [0.3, None, 0.3, None, None, 2]],
+    ['ny', 'affine_dance', [None, None, None, None, 0.3, 2]],
+    ['sushi', 'resize_round', [0.5, None, 0.3, None, None, 1]],
 ]
 
 
@@ -41,23 +66,29 @@ def generate_one_frame(gan, input_tensor, frame_shape, scale, geo_shifts, center
         else:
             out_mask, out_size = prepare_geometric(base_sz, scale, geo_shifts)
 
-            output_tensor, _, _ = gan.test(input_tensor=input_tensor,
-                                           input_size=in_size,
-                                           output_size=out_size,
-                                           rand_affine=geo_shifts,
-                                           run_d_pred=False,
-                                           run_reconstruct=False)
+            output_tensor, _, _ = gan.test(
+                input_tensor=input_tensor,
+                input_size=in_size,
+                output_size=out_size,
+                rand_affine=geo_shifts,
+                run_d_pred=False,
+                run_reconstruct=False
+            )
 
         out = out_mask * output_tensor[1] - 1 + out_mask
         margin = np.uint16((frame_shape - np.array(out_size)) / 2) if center else [0, 0]
-        out_pad[margin[0]:margin[0] + out_size[0], margin[1]:margin[1] + out_size[1], :] = util.hist_match(util.tensor2im(out), util.tensor2im(input_tensor), util.tensor2im(out_mask))
+        out_pad[margin[0]:margin[0] + out_size[0], margin[1]:margin[1] + out_size[1], :] = util.hist_match(
+            util.tensor2im(out), util.tensor2im(input_tensor), util.tensor2im(out_mask)
+        )
         return out_pad
 
 
 def generate_one_scene(gan, input_tensor, scene_script, frame_shape, center):
     frames = []
     for i, (scale_v, scale_h, shift_l, shift_r) in enumerate(scene_script):
-        output_image = generate_one_frame(gan, input_tensor, frame_shape, [scale_v, scale_h], [shift_l, shift_r], center)
+        output_image = generate_one_frame(
+            gan, input_tensor, frame_shape, [scale_v, scale_h], [shift_l, shift_r], center
+        )
         frames.append(output_image)
     return np.stack(frames, axis=0)
 
@@ -93,38 +124,57 @@ def generate_full_video(video_script, frame_shape):
                 cur_scene_script_param = scene_script_param[:]
                 if scene_script_param[1] is None:
                     cur_scene_script_param[1] = cur_frame_shape[0] * 1.0 / input_tensor.shape[2]
-                    print 'max scale vertical:', cur_scene_script_param[1]
+                    print('max scale vertical:', cur_scene_script_param[1])
                 if cur_scene_script_param[3] is None:
                     cur_scene_script_param[3] = cur_frame_shape[1] * 1.0 / input_tensor.shape[3]
-                    print 'max scale horizontal:', cur_scene_script_param[3]
+                    print('max scale horizontal:', cur_scene_script_param[3])
 
                 scene_script = make_scene_script(scene_script_name, *cur_scene_script_param)
 
                 center = (cur_scene_script_param[4] is not None)
 
-
-                scene = generate_one_scene(gan, input_tensor, scene_script, np.array([cur_frame_shape[0], cur_frame_shape[1]]), center)
+                scene = generate_one_scene(
+                    gan, input_tensor, scene_script, np.array([cur_frame_shape[0], cur_frame_shape[1]]), center
+                )
                 partial_screen_scenes.append(scene)
 
-                print 'Done with %s,  (scene %d/%d)' % (name, i + 1, n_scenes)
+                print('Done with %s,  (scene %d/%d)' % (name, i + 1, n_scenes))
 
-
-            scene = np.concatenate(partial_screen_scenes, axis=concat_axis) if len(partial_screen_scenes) > 1 else partial_screen_scenes[0]
+            scene = np.concatenate(partial_screen_scenes,
+                                   axis=concat_axis) if len(partial_screen_scenes) > 1 else partial_screen_scenes[0]
             scenes.append(scene)
 
         scene = np.concatenate(scenes, axis=0)
 
-        outputdict = {'-b:v': '30000000', '-r': '100.0',
-                      '-vf': 'drawtext="text=\'Input image\':fontcolor=red:fontsize=48:x=(w-text_w)/2:y=(h-text_h)*7/8:enable=\'between(t,0,2)\'"',
-                      '-preset': 'slow', '-profile:v': 'high444', '-level:v': '4.0', '-crf': '22'}
+        outputdict = {
+            '-b:v':
+                '30000000',
+            '-r':
+                '100.0',
+            '-vf':
+                'drawtext="text=\'Input image\':fontcolor=red:fontsize=48:x=(w-text_w)/2:y=(h-text_h)*7/8:enable=\'between(t,0,2)\'"',
+            '-preset':
+                'slow',
+            '-profile:v':
+                'high444',
+            '-level:v':
+                '4.0',
+            '-crf':
+                '22'
+        }
         if len(names) > 1:
-            outputdict['-vf'] = 'drawtext="text=\'Input images\':fontcolor=red:fontsize=48:x=(w-text_w)/2:y=(h-text_h)/2.5:enable=\'between(t,0,2)\'"'
+            outputdict[
+                '-vf'
+            ] = 'drawtext="text=\'Input images\':fontcolor=red:fontsize=48:x=(w-text_w)/2:y=(h-text_h)/2.5:enable=\'between(t,0,2)\'"'
 
         if not scene_script_params[-1]:
-            outputdict['-vf'] = 'drawtext="text=\'Input images\':fontcolor=red:fontsize=48:x=(w-text_w)/2:y=(h-text_h)/2.5:enable=\'between(t,0,0)\'"'
+            outputdict[
+                '-vf'
+            ] = 'drawtext="text=\'Input images\':fontcolor=red:fontsize=48:x=(w-text_w)/2:y=(h-text_h)/2.5:enable=\'between(t,0,0)\'"'
 
-        writer = FFmpegWriter(conf.output_dir_path + '/vid%d_%s.mp4' % (i, '_'.join(names)), verbosity=1,
-                              outputdict=outputdict)
+        writer = FFmpegWriter(
+            conf.output_dir_path + '/vid%d_%s.mp4' % (i, '_'.join(names)), verbosity=1, outputdict=outputdict
+        )
         for frame in scene:
             for j in range(3):
                 writer.writeFrame(frame)
@@ -136,8 +186,10 @@ def prepare_geometric(base_sz, scale, geo_shifts):
     pad_r = np.abs(np.int(np.ceil(base_sz[3] * geo_shifts[1])))
     in_mask = torch.zeros(base_sz[0], base_sz[1], base_sz[2], pad_l + base_sz[3] + pad_r).cuda()
     in_size = in_mask.shape[2:]
-    out_size = (np.uint32(np.floor(scale[0] * in_size[0] * 1.0 / MUST_DIVIDE) * MUST_DIVIDE),
-                np.uint32(np.floor(scale[1] * in_size[1] * 1.0 / MUST_DIVIDE) * MUST_DIVIDE))
+    out_size = (
+        np.uint32(np.floor(scale[0] * in_size[0] * 1.0 / MUST_DIVIDE) * MUST_DIVIDE),
+        np.uint32(np.floor(scale[1] * in_size[1] * 1.0 / MUST_DIVIDE) * MUST_DIVIDE)
+    )
     if pad_r > 0:
         in_mask[:, :, :, pad_l:-pad_r] = torch.ones(base_sz)
     else:

@@ -1,0 +1,21 @@
+name: ingan
+channels:
+  - pytorch
+  - defaults
+dependencies:
+  - cudatoolkit>=10.2
+  - numpy
+  - pillow
+  - pip
+  - python>=3.8.10
+  - pytorch>=1.9.0
+  - torchvision>=0.4
+  - scipy
+  - scikit-learn
+  - seaborn
+  - pip:
+    - opencv-python
+    - scikit-video
+    - ipython
+    - pytest
+    - yapf
